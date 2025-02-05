@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369869473934",
+    "project_id": "teamwork-1010",
+    "storage_bucket": "teamwork-1010.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369869473934:android:b24c11c9bbf448d6d7a1df",
+        "android_client_info": {
+          "package_name": "com.example.teamwork"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzoRxngY26dbhXQDuHVZ_5bq0IOIWkFkM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

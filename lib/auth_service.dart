@@ -1,15 +1,22 @@
+import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
 class AuthService {
-  final LocalAuthentication _auth = LocalAuthentication();
+  final LocalAuthentication _localAuth = LocalAuthentication();
 
-  Future<bool> authenticate() async {
-    bool authenticated = await _auth.authenticate(
-      localizedReason: 'Scan your fingerprint to authenticate',
-      options: AuthenticationOptions(
-        biometricOnly: true, // Only biometric authentication (no PIN/pattern)
-      ),
-    );
-    return authenticated;
+  Future<bool> authenticateWithFingerprint() async {
+    try {
+      bool isAuthenticated = await _localAuth.authenticate(
+        localizedReason: 'Please authenticate to proceed',
+        options: AuthenticationOptions(
+          useErrorDialogs: true,
+          stickyAuth: true,
+        ),
+      );
+      return isAuthenticated;
+    } on PlatformException catch (e) {
+      print('Error authenticating: $e');
+      return false;
+    }
   }
 }

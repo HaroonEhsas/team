@@ -1,69 +1,42 @@
 import 'package:flutter/material.dart';
-import 'database_helper.dart';
-import 'team_details_screen.dart';
 
 class TeamManagementScreen extends StatefulWidget {
-  const TeamManagementScreen({super.key});
-
   @override
-  TeamManagementScreenState createState() => TeamManagementScreenState();
+  _TeamManagementScreenState createState() => _TeamManagementScreenState();
 }
 
-class TeamManagementScreenState extends State<TeamManagementScreen> {
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final TextEditingController _teamNameController = TextEditingController();
-  List<Map<String, dynamic>> _teams = [];
+class _TeamManagementScreenState extends State<TeamManagementScreen> {
+  final List<String> _teams = [];
+  final TextEditingController _teamController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _loadTeams();
-  }
-
-  Future<void> _loadTeams() async {
-    _teams = await _databaseHelper.getTeams();
-    setState(() {});
-  }
-
-  // Now, handle navigation before the async call
-  void _createTeam(BuildContext context) {
-    if (_teamNameController.text.isEmpty) return;
-
-    // Navigate to TeamDetailsScreen first
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TeamDetailsScreen(teamName: _teamNameController.text),
-      ),
-    );
-
-    // Perform the async operation afterwards
-    _createTeamInDatabase();
-  }
-
-  Future<void> _createTeamInDatabase() async {
-    // Creating the team in the database
-    await _databaseHelper.createTeam(_teamNameController.text as Map<String, dynamic>);
-    _teamNameController.clear();
-    await _loadTeams();
+  void _addTeam() {
+    setState(() {
+      _teams.add(_teamController.text);
+    });
+    _teamController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Team Management')),
+      appBar: AppBar(
+        title: Text('Manage Teams'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
             TextField(
-              controller: _teamNameController,
-              decoration: InputDecoration(labelText: 'Team Name'),
+              controller: _teamController,
+              decoration: InputDecoration(
+                labelText: 'Team Name',
+                border: OutlineInputBorder(),
+              ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _createTeam(context), // Use context immediately
-              child: Text('Create Team'),
+              onPressed: _addTeam,
+              child: Text('Add Team'),
             ),
             SizedBox(height: 20),
             Expanded(
@@ -71,7 +44,15 @@ class TeamManagementScreenState extends State<TeamManagementScreen> {
                 itemCount: _teams.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(_teams[index]['name']),
+                    title: Text(_teams[index]),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        setState(() {
+                          _teams.removeAt(index);
+                        });
+                      },
+                    ),
                   );
                 },
               ),

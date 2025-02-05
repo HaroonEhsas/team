@@ -1,63 +1,55 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'team_management_screen.dart';
-import 'task_management_screen.dart';
-import 'messaging_screen.dart';
 
-void main() {
-  runApp(AttendanceApp());
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print("Message received in background: ${message.messageId}");
 }
 
-class AttendanceApp extends StatelessWidget {
-  const AttendanceApp({super.key});
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  // Request permission
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  // Get the FCM token
+  String? token = await messaging.getToken();
+  print("FCM Token: $token");
+
+  // Listen for foreground messages
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print("Received a message: ${message.notification?.title}");
+  });
+
+  // Handle background messages
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Attendance App',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomeScreen(),
-      routes: {
-        '/team': (context) => TeamManagementScreen(),
-        '/task': (context) => TaskManagementScreen(),
-        '/message': (context) => MessagingScreen(),
-      },
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Attendance App')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/team');
-              },
-              child: Text('Team Management'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/task');
-              },
-              child: Text('Task Management'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/message');
-              },
-              child: Text('Messaging'),
-            ),
-          ],
-        ),
+      debugShowCheckedModeBanner: false,
+      title: 'Firebase Messaging Demo',
+      home: Scaffold(
+        appBar: AppBar(title: Text('Firebase Messaging')),
+        body: Center(child: Text('Listening for messages...')),
       ),
     );
   }

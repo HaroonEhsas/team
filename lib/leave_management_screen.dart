@@ -1,74 +1,35 @@
 import 'package:flutter/material.dart';
-import 'database_helper.dart';
+import 'auth_service.dart';
 
-class LeaveManagementScreen extends StatefulWidget {
-  const LeaveManagementScreen({super.key});
-
-  @override
-  LeaveManagementScreenState createState() => LeaveManagementScreenState();
-}
-
-class LeaveManagementScreenState extends State<LeaveManagementScreen> {
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final TextEditingController _reasonController = TextEditingController();
-  List<Map<String, dynamic>> _leaves = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadLeaves();
-  }
-
-  Future<void> _loadLeaves() async {
-    _leaves = await _databaseHelper.getLeaves();
-    setState(() {});
-  }
-
-  Future<void> _applyLeave() async {
-    if (_reasonController.text.isEmpty) return;
-    await _databaseHelper.applyLeave({
-      'employee_id': 1, // Replace with actual employee ID
-      'start_date': DateTime.now().toString(),
-      'end_date': DateTime.now().add(Duration(days: 1)).toString(),
-      'reason': _reasonController.text,
-      'status': 'Pending',
-    });
-    _reasonController.clear();
-    await _loadLeaves();
-  }
-
+class LeaveManagementScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Leave Management')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _reasonController,
-              decoration: InputDecoration(labelText: 'Reason for Leave'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _applyLeave,
-              child: Text('Apply Leave'),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _leaves.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_leaves[index]['reason']),
-                    subtitle: Text(_leaves[index]['status']),
-                  );
-                },
-              ),
-            ),
-          ],
+    return ListView(
+      padding: EdgeInsets.all(20),
+      children: [
+        Card(
+          elevation: 5,
+          child: ListTile(
+            leading: Icon(Icons.calendar_today),
+            title: Text('Leave Requests'),
+            subtitle: Text('Submit new leave requests'),
+            onTap: () {
+              // Navigate to Submit Leave screen
+            },
+          ),
         ),
-      ),
+        Card(
+          elevation: 5,
+          child: ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Leave History'),
+            subtitle: Text('View your leave history'),
+            onTap: () {
+              // Navigate to Leave History screen
+            },
+          ),
+        ),
+      ],
     );
   }
 }
